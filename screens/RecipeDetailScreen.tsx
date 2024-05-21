@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -21,14 +22,35 @@ type Props = {
   navigation: RecipeDetailScreenNavigationProp;
 };
 
-const RecipeDetailScreen: React.FC<Props> = ({ route }) => {
+const RecipeDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { recipe } = route.params;
+
+  const addToFavorites = async () => {
+    try {
+      const savedFavorites = await AsyncStorage.getItem('favorites');
+      let favorites: Recipe[] = [];
+      if (savedFavorites) {
+        favorites = JSON.parse(savedFavorites);
+      }
+      // Check if recipe already exists in favorites
+      const exists = favorites.some((favRecipe) => favRecipe.id === recipe.id);
+      if (!exists) {
+        favorites.push(recipe);
+        await AsyncStorage.setItem('favorites', JSON.stringify(favorites));
+        Alert.alert('Success', 'Recipe added to favorites');
+      } else {
+        Alert.alert('Warning', 'Recipe already in favorites');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{recipe.title}</Text>
       <Text style={styles.description}>{recipe.description}</Text>
-      <Button title="Add to Favorites" onPress={() => {/* Handle add to favorites */}} />
+      <Button title="Add to Favorites" onPress={addToFavorites} />
     </View>
   );
 };

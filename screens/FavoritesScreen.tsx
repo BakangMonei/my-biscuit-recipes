@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -39,6 +39,17 @@ const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
     fetchFavorites();
   }, []);
 
+  const removeFromFavorites = async (recipeId: number) => {
+    try {
+      const updatedFavorites = favorites.filter((recipe) => recipe.id !== recipeId);
+      await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      setFavorites(updatedFavorites);
+      Alert.alert('Success', 'Recipe removed from favorites');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -48,6 +59,7 @@ const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}>
             <View style={styles.recipeItem}>
               <Text>{item.title}</Text>
+              <Button title="Remove" onPress={() => removeFromFavorites(item.id)} />
             </View>
           </TouchableOpacity>
         )}
@@ -62,7 +74,11 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   recipeItem: {
-    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
