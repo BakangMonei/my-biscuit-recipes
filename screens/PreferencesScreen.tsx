@@ -3,7 +3,7 @@ import { View, Text, Switch, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 
-const PreferencesScreen: React.FC = () => {
+const PreferencesScreen: React.FC = ({ navigation }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [fontSize, setFontSize] = useState('medium');
   const [fontType, setFontType] = useState('serif');
@@ -47,6 +47,15 @@ const PreferencesScreen: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('user');
+      navigation.navigate('LoginPage');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.preference}>
@@ -69,8 +78,11 @@ const PreferencesScreen: React.FC = () => {
         </Picker>
       </View>
       <View style={styles.buttonContainer}>
-        <Button  title="Save Preferences" onPress={savePreferences} />
+        <Button title="Save Preferences" onPress={savePreferences} />
         <Button title="Reset Preferences" onPress={resetPreferences} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Logout" onPress={handleLogout} />
       </View>
     </View>
   );
@@ -80,7 +92,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    
   },
   preference: {
     flexDirection: 'row',
