@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RouteProp } from "@react-navigation/native";
 
 type RootStackParamList = {
   AddRecipe: undefined;
 };
 
-type AddRecipeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddRecipe'>;
+type AddRecipeScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "AddRecipe"
+>;
 
 type Recipe = {
   id: number;
@@ -22,13 +35,38 @@ type Props = {
 };
 
 const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState<string | null>(null);
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission required",
+        "Sorry, we need camera roll permissions to make this work!"
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
   const saveRecipe = async () => {
-    if (!title || !description || !image) {
-      Alert.alert('Validation Error', 'Please provide a title, description, and an image URL.');
+    if (!title || !description || image) {
+      Alert.alert(
+        "Validation Error",
+        "Please provide a title, description, and an image."
+      );
       return;
     }
 
@@ -39,10 +77,10 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
         description,
         image,
       };
-      const savedRecipes = await AsyncStorage.getItem('recipes');
+      const savedRecipes = await AsyncStorage.getItem("recipes");
       const recipes = savedRecipes ? JSON.parse(savedRecipes) : [];
       recipes.push(newRecipe);
-      await AsyncStorage.setItem('recipes', JSON.stringify(recipes));
+      await AsyncStorage.setItem("recipes", JSON.stringify(recipes));
       navigation.goBack();
     } catch (error) {
       console.error(error);
@@ -56,12 +94,9 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
         ) : (
-          <TextInput
-            style={styles.imageInput}
-            placeholder="Image URL"
-            value={image || ''}
-            onChangeText={setImage}
-          />
+          <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+            <Text style={styles.imagePickerText}>Tap to select an image</Text>
+          </TouchableOpacity>
         )}
       </View>
       <TextInput
@@ -89,61 +124,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginVertical: 20,
   },
   imageContainer: {
-    width: '100%',
+    width: "100%",
     height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
-  imageInput: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    color: '#888',
+  imagePicker: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+  },
+  imagePickerText: {
+    color: "#888",
     fontSize: 16,
   },
   input: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
     marginVertical: 8,
     padding: 8,
     fontSize: 16,
   },
   descriptionInput: {
     height: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     paddingVertical: 15,
     marginVertical: 20,
     borderRadius: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   saveButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 
