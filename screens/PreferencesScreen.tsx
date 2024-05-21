@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Switch, Button, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Switch, Button, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 
@@ -8,9 +8,40 @@ const PreferencesScreen: React.FC = () => {
   const [fontSize, setFontSize] = useState('medium');
   const [fontType, setFontType] = useState('serif');
 
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const savedPreferences = await AsyncStorage.getItem('preferences');
+        if (savedPreferences) {
+          const { darkMode, fontSize, fontType } = JSON.parse(savedPreferences);
+          setDarkMode(darkMode);
+          setFontSize(fontSize);
+          setFontType(fontType);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
   const savePreferences = async () => {
     try {
       await AsyncStorage.setItem('preferences', JSON.stringify({ darkMode, fontSize, fontType }));
+      Alert.alert('Success', 'Preferences saved successfully');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const resetPreferences = async () => {
+    try {
+      await AsyncStorage.removeItem('preferences');
+      setDarkMode(false);
+      setFontSize('medium');
+      setFontType('serif');
+      Alert.alert('Success', 'Preferences reset to default');
     } catch (error) {
       console.error(error);
     }
@@ -37,7 +68,10 @@ const PreferencesScreen: React.FC = () => {
           <Picker.Item label="Sans-Serif" value="sans-serif" />
         </Picker>
       </View>
-      <Button title="Save Preferences" onPress={savePreferences} />
+      <View style={styles.buttonContainer}>
+        <Button title="Save Preferences" onPress={savePreferences} />
+        <Button title="Reset Preferences" onPress={resetPreferences} />
+      </View>
     </View>
   );
 };
@@ -52,6 +86,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 16,
   },
 });
 

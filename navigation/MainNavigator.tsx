@@ -9,6 +9,7 @@ import FavoritesScreen from '../screens/FavoritesScreen';
 import ScalesScreen from '../screens/ScalesScreen';
 import PreferencesScreen from '../screens/PreferencesScreen';
 import SplashScreen from '../screens/SplashScreen'
+import { Ionicons } from '@expo/vector-icons';
 
 
 const Stack = createNativeStackNavigator();
@@ -23,7 +24,32 @@ const RecipesStack = () => (
 );
 
 const MainNavigator = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        let iconName;
+
+        if (route.name === 'Home') {
+          iconName = 'home-outline';
+        } else if (route.name === 'Recipes') {
+          iconName = 'book-outline';
+        } else if (route.name === 'Favorites') {
+          iconName = 'heart-outline';
+        } else if (route.name === 'Scales') {
+          iconName = 'analytics-outline';
+        } else if (route.name === 'Preferences') {
+          iconName = 'settings-outline';
+        }
+
+        // You can return any component that you like here!
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+    })}
+    tabBarOptions={{
+      activeTintColor: 'tomato',
+      inactiveTintColor: 'gray',
+    }}
+  >
     <Tab.Screen name="Home" component={HomeScreen} />
     <Tab.Screen name="Recipes" component={RecipesStack} />
     <Tab.Screen name="Favorites" component={FavoritesScreen} />

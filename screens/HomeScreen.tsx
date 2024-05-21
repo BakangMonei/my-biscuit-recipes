@@ -18,15 +18,8 @@ type Props = {
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text>Welcome to MyGreatBiscuitRecipes!</Text>
-      <Button
-        title="View Recipes"
-        onPress={() => navigation.navigate('RecipeList')}
-      />
-      <Button
-        title="Preferences"
-        onPress={() => navigation.navigate('Preferences')}
-      />
+      <Text>Main Menu</Text>
+      
     </View>
   );
 };
