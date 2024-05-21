@@ -69,7 +69,7 @@ const PreferencesScreen: React.FC = () => {
         </Picker>
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Save Preferences" onPress={savePreferences} />
+        <Button  title="Save Preferences" onPress={savePreferences} />
         <Button title="Reset Preferences" onPress={resetPreferences} />
       </View>
     </View>
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    
   },
   preference: {
     flexDirection: 'row',

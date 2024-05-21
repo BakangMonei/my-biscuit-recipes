@@ -27,10 +27,23 @@ const RegistrationScreen: React.FC = ({ navigation }) => {
 
     // Save registration data to AsyncStorage
     try {
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify({ name, email, password })
-      );
+      // Retrieve existing users or initialize an empty array
+      const existingUsersString = await AsyncStorage.getItem("users");
+      const existingUsers = existingUsersString
+        ? JSON.parse(existingUsersString)
+        : [];
+
+      // Check if email already exists
+      if (existingUsers.some((user) => user.email === email)) {
+        Alert.alert("Error", "Email already exists");
+        return;
+      }
+
+      // Save the new user
+      const newUser = { name, email, password };
+      existingUsers.push(newUser);
+      await AsyncStorage.setItem("users", JSON.stringify(existingUsers));
+
       Alert.alert("Success", "Registration successful");
       navigation.navigate("LoginPage");
     } catch (error) {
@@ -110,20 +123,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#ff6347",
-    height: 50,
-    borderRadius: 8,
-    justifyContent: "center",
+    backgroundColor: "#4CAF50",
+    paddingVertical: 15,
+    marginVertical: 20,
+    borderRadius: 5,
     alignItems: "center",
-    marginBottom: 10,
   },
   buttonText: {
-    color: "#ffffff",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
   link: {
-    color: "#ff6347",
+    color: "#000000",
     textAlign: "center",
     marginTop: 10,
   },
