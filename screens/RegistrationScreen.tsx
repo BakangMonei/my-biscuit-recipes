@@ -1,7 +1,34 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegistrationScreen: React.FC = ({ navigation }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegistration = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    // Save registration data to AsyncStorage
+    try {
+      await AsyncStorage.setItem('user', JSON.stringify({ name, email, password }));
+      Alert.alert('Success', 'Registration successful');
+      navigation.navigate('LoginPage');
+    } catch (error) {
+      console.error('Error saving registration data:', error);
+      Alert.alert('Error', 'Failed to register. Please try again.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
@@ -10,27 +37,35 @@ const RegistrationScreen: React.FC = ({ navigation }) => {
         placeholder="Name"
         placeholderTextColor="#666"
         style={styles.input}
+        value={name}
+        onChangeText={setName}
       />
       <TextInput
         placeholder="Email"
         placeholderTextColor="#666"
         style={styles.input}
         keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         placeholder="Password"
         placeholderTextColor="#666"
         style={styles.input}
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
       <TextInput
         placeholder="Confirm Password"
         placeholderTextColor="#666"
         style={styles.input}
         secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
       />
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={handleRegistration}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       
