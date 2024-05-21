@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -25,28 +24,14 @@ type Props = {
 const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState<string | null>(null);
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need camera roll permissions to make this work!');
+  const saveRecipe = async () => {
+    if (!title || !description || !image) {
+      Alert.alert('Validation Error', 'Please provide a title, description, and an image URL.');
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImage(result.uri);
-    }
-  };
-
-  const saveRecipe = async () => {
     try {
       const newRecipe: Recipe = {
         id: Date.now(),
@@ -66,13 +51,16 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header}>Add a New Recipe</Text>
       <View style={styles.imageContainer}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
         ) : (
-          <Image
-            source={{ uri: 'https://example.com/avatar.png' }}
-            style={styles.avatar}
+          <TextInput
+            style={styles.imageInput}
+            placeholder="Image URL"
+            value={image || ''}
+            onChangeText={setImage}
           />
         )}
       </View>
@@ -90,8 +78,9 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
         value={description}
         onChangeText={setDescription}
       />
-      <Button title="Upload Image" onPress={pickImage} />
-      <Button title="Save Recipe" onPress={saveRecipe} />
+      <TouchableOpacity style={styles.saveButton} onPress={saveRecipe}>
+        <Text style={styles.saveButtonText}>Save Recipe</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -100,30 +89,61 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 20,
   },
   imageContainer: {
     width: '100%',
     height: 200,
-    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
     overflow: 'hidden',
-    marginVertical: 8,
   },
   image: {
     width: '100%',
     height: '100%',
   },
-  avatar: {
+  imageInput: {
     width: '100%',
     height: '100%',
-    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    color: '#888',
+    fontSize: 16,
   },
   input: {
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    marginVertical: 8,padding: 8,
+    marginVertical: 8,
+    padding: 8,
+    fontSize: 16,
   },
   descriptionInput: {
-    height: 120,
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    marginVertical: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

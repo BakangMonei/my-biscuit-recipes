@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 type RootStackParamList = {
   Favorites: undefined;
@@ -15,6 +15,7 @@ type Recipe = {
   id: number;
   title: string;
   description: string;
+  image: string;
 };
 
 type Props = {
@@ -50,19 +51,49 @@ const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const handleShare = (recipe: Recipe) => {
+    Share.share({
+      message: `${recipe.title}\n\n${recipe.description}`,
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <FlatList
+      <SwipeListView
         data={favorites}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}>
             <View style={styles.recipeItem}>
-              <Text>{item.title}</Text>
-              <Button title="Remove" onPress={() => removeFromFavorites(item.id)} />
+              {item.image ? (
+                <Image source={{ uri: item.image }} style={styles.recipeImage} />
+              ) : (
+                <View style={styles.placeholderImage} />
+              )}
+              <Text style={styles.recipeTitle}>{item.title}</Text>
             </View>
           </TouchableOpacity>
         )}
+        renderHiddenItem={({ item }) => (
+          <View style={styles.rowBack}>
+            <TouchableOpacity
+              style={[styles.backRightBtn, styles.backRightBtnLeft]}
+              onPress={() => handleShare(item)}
+            >
+              <Text style={styles.backTextWhite}>Share</Text>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity
+              style={[styles.backRightBtn, styles.backRightBtnRight]}
+              onPress={() => removeFromFavorites(item.id)}
+            >
+              <Text style={styles.backTextWhite}>Remove</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        leftOpenValue={0}
+        rightOpenValue={-150}
       />
     </View>
   );
@@ -72,15 +103,55 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
   },
   recipeItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 8,
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    backgroundColor: '#fff',
+  },
+  recipeTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 16,
+  },
+  recipeImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  placeholderImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#ccc',
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 15,
+  },
+  backRightBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+    backgroundColor: 'red',
+  },
+  backRightBtnLeft: {
+    backgroundColor: 'green',
+  },
+  backRightBtnRight: {
+    backgroundColor: 'red',
+  },
+  backTextWhite: {
+    color: '#FFF',
   },
 });
 
