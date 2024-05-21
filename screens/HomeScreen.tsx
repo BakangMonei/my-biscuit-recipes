@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { Recipe } from "./RecipeListScreen"; // Assuming Recipe type is exported from RecipeListScreen
+import { Recipe } from "./RecipeListScreen";
 
 type RootStackParamList = {
   Home: undefined;
@@ -12,9 +12,17 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
 type Props = {
   navigation: HomeScreenNavigationProp;
+  route: {
+    params: {
+      user: {
+        name: string;
+        email: string;
+      };
+    };
+  };
 };
 
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
+const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [currentUser, setCurrentUser] = useState<{
     name: string;
@@ -24,14 +32,12 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch recipes
         const savedRecipes = await AsyncStorage.getItem("recipes");
         if (savedRecipes) {
           setRecipes(JSON.parse(savedRecipes));
         }
-
-        // Fetch current user
-        const userString = await AsyncStorage.getItem("users");
+    
+        const userString = await AsyncStorage.getItem("currentUser");
         if (userString) {
           const user = JSON.parse(userString);
           setCurrentUser(user);
@@ -49,25 +55,27 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <Text>Main Menu</Text>
       <Text>Welcome, {currentUser.name}</Text>
       <Text>Email: {currentUser.email}</Text>
-      <View style={styles.gridContainer}>
-        {recipes.map((recipe, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.cardContainer}
-            onPress={() => navigation.navigate("RecipeDetail", { recipe })}
-          >
-            {recipe.image ? (
-              <Image
-                source={{ uri: recipe.image }}
-                style={styles.recipeImage}
-              />
-            ) : (
-              <View style={styles.placeholderImage} />
-            )}
-            <Text style={styles.recipeTitle}>{recipe.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView style={{ flex: 1 }}>
+        <View style={styles.gridContainer}>
+          {recipes.map((recipe, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.cardContainer}
+              onPress={() => navigation.navigate("RecipeDetail", { recipe })}
+            >
+              {recipe.image ? (
+                <Image
+                  source={{ uri: recipe.image }}
+                  style={styles.recipeImage}
+                />
+              ) : (
+                <View style={styles.placeholderImage} />
+              )}
+              <Text style={styles.recipeTitle}>{recipe.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 };

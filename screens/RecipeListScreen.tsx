@@ -15,7 +15,7 @@ import { SwipeListView } from "react-native-swipe-list-view";
 type RootStackParamList = {
   RecipeList: undefined;
   RecipeDetail: { recipe: Recipe };
-  AddRecipe: { recipe?: Recipe };
+  AddRecipe: { recipe?: Recipe; refreshList: () => void }; // Add refreshList to props
 };
 
 type RecipeListScreenNavigationProp = StackNavigationProp<
@@ -52,6 +52,18 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
     fetchRecipes();
   }, []);
 
+  // Function to refresh recipe list
+  const refreshRecipeList = async () => {
+    try {
+      const savedRecipes = await AsyncStorage.getItem("recipes");
+      if (savedRecipes) {
+        setRecipes(JSON.parse(savedRecipes));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const deleteRecipe = async (recipeId: number) => {
     try {
       const updatedRecipes = recipes.filter((r) => r.id !== recipeId);
@@ -69,7 +81,7 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleEdit = (recipe: Recipe) => {
-    navigation.navigate("AddRecipe", { recipe });
+    navigation.navigate("AddRecipe", { recipe, refreshList: refreshRecipeList }); // Pass refreshList to AddRecipe
   };
 
   return (
@@ -136,7 +148,7 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
       />
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate("AddRecipe")}
+        onPress={() => navigation.navigate("AddRecipe", { refreshList: refreshRecipeList })}
       >
         <Text style={styles.addButtonText}>Add Recipe</Text>
       </TouchableOpacity>

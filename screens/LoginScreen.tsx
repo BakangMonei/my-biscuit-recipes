@@ -18,13 +18,14 @@ const LoginScreen: React.FC = ({ navigation }) => {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
-
+  
     try {
       const usersString = await AsyncStorage.getItem("users");
       if (usersString) {
         const users = JSON.parse(usersString);
         const user = users.find((u) => u.email === email && u.password === password);
         if (user) {
+          await AsyncStorage.setItem("currentUser", JSON.stringify(user)); // Store current user data
           navigation.navigate("Main");
         } else {
           Alert.alert("Error", "Invalid email or password");
