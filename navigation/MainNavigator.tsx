@@ -12,17 +12,24 @@ import SplashScreen from '../screens/SplashScreen'
 
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const RecipesStack = () => (
+  <Stack.Navigator>
+    <Stack.Screen name="RecipeList" component={RecipeListScreen} />
+    <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
+    <Stack.Screen name="AddRecipe" component={AddRecipeScreen} />
+  </Stack.Navigator>
+);
 
 const MainNavigator = () => (
-  <Stack.Navigator>
-    <Stack.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name="Recipes" component={RecipeListScreen} />
-    {/* <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} /> */}
-    <Stack.Screen name="AddRecipe" component={AddRecipeScreen} />
-    <Stack.Screen name="Favorites" component={FavoritesScreen} />
-    <Stack.Screen name="Scales" component={ScalesScreen} />
-    <Stack.Screen name="Preferences" component={PreferencesScreen} />
-  </Stack.Navigator>
+  <Tab.Navigator>
+    <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Screen name="Recipes" component={RecipesStack} />
+    <Tab.Screen name="Favorites" component={FavoritesScreen} />
+    <Tab.Screen name="Scales" component={ScalesScreen} />
+    <Tab.Screen name="Preferences" component={PreferencesScreen} />
+  </Tab.Navigator>
 );
 
 export default MainNavigator;
