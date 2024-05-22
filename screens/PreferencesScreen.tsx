@@ -1,91 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Switch, Button, StyleSheet, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 
-const PreferencesScreen: React.FC = ({ navigation }) => {
+const PreferencesScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
-  const [fontSize, setFontSize] = useState("medium");
-  const [fontType, setFontType] = useState("serif");
+  const [fontSize, setFontSize] = useState(16);
+  const [fontFamily, setFontFamily] = useState('System');
 
-  useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        const savedPreferences = await AsyncStorage.getItem("preferences");
-        if (savedPreferences) {
-          const { darkMode, fontSize, fontType } = JSON.parse(savedPreferences);
-          setDarkMode(darkMode);
-          setFontSize(fontSize);
-          setFontType(fontType);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
-    loadPreferences();
-  }, []);
+  const increaseFontSize = () => {
+    setFontSize(fontSize + 1);
+  };
 
-  const savePreferences = async () => {
-    try {
-      await AsyncStorage.setItem(
-        "preferences",
-        JSON.stringify({ darkMode, fontSize, fontType })
-      );
-      Alert.alert("Success", "Preferences saved successfully");
-    } catch (error) {
-      console.error(error);
+  const decreaseFontSize = () => {
+    if (fontSize > 12) {
+      setFontSize(fontSize - 1);
     }
   };
 
-  const resetPreferences = async () => {
-    try {
-      await AsyncStorage.removeItem("preferences");
-      setDarkMode(false);
-      setFontSize("medium");
-      setFontType("serif");
-      Alert.alert("Success", "Preferences reset to default");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("user");
-      navigation.navigate("LoginPage");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+  const toggleFontFamily = () => {
+    setFontFamily(fontFamily === 'System' ? 'Arial' : 'System');
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.preference}>
-        <Text>Dark Mode</Text>
-        <Switch value={darkMode} onValueChange={setDarkMode} />
+    <View style={[styles.container, darkMode && styles.darkContainer]}>
+      <Text style={[styles.title, darkMode && styles.darkTitle]}>Preferences</Text>
+
+      <View style={styles.option}>
+        <Text style={[styles.optionText, darkMode && styles.darkOptionText]}>Dark Mode</Text>
+        <Switch value={darkMode} onValueChange={toggleDarkMode} />
       </View>
-      <View style={styles.preference}>
-        <Text>Font Size</Text>
-        <Picker selectedValue={fontSize} onValueChange={setFontSize}>
-          <Picker.Item label="Small" value="small" />
-          <Picker.Item label="Medium" value="medium" />
-          <Picker.Item label="Large" value="large" />
-        </Picker>
+
+      <View style={styles.option}>
+        <Text style={[styles.optionText, darkMode && styles.darkOptionText]}>Font Size</Text>
+        <TouchableOpacity onPress={decreaseFontSize}>
+          <Text style={[styles.buttonText, darkMode && styles.darkButtonText]}>-</Text>
+        </TouchableOpacity>
+        <Text style={[styles.fontSizeText, darkMode && styles.darkFontSizeText]}>{fontSize}</Text>
+        <TouchableOpacity onPress={increaseFontSize}>
+          <Text style={[styles.buttonText, darkMode && styles.darkButtonText]}>+</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.preference}>
-        <Text>Font Type</Text>
-        <Picker selectedValue={fontType} onValueChange={setFontType}>
-          <Picker.Item label="Serif" value="serif" />
-          <Picker.Item label="Sans-Serif" value="sans-serif" />
-        </Picker>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Save Preferences" onPress={savePreferences} />
-        <Button title="Reset Preferences" onPress={resetPreferences} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Logout" onPress={handleLogout} />
+
+      <View style={styles.option}>
+        <Text style={[styles.optionText, darkMode && styles.darkOptionText]}>Font Family</Text>
+        <TouchableOpacity onPress={toggleFontFamily}>
+          <Text style={[styles.fontFamilyText, darkMode && styles.darkFontFamilyText]}>{fontFamily}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -94,18 +57,55 @@ const PreferencesScreen: React.FC = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  preference: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 8,
+  darkContainer: {
+    backgroundColor: '#333',
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: 16,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#000',
+  },
+  darkTitle: {
+    color: '#fff',
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 18,
+    color: '#000',
+  },
+  darkOptionText: {
+    color: '#fff',
+  },
+  fontSizeText: {
+    fontSize: 18,
+    marginHorizontal: 10,
+    color: '#000',
+  },
+  darkFontSizeText: {
+    color: '#fff',
+  },
+  buttonText: {
+    fontSize: 20,
+    color: '#007BFF',
+  },
+  darkButtonText: {
+    color: '#fff',
+  },
+  fontFamilyText: {
+    fontSize: 18,
+    color: '#007BFF',
+  },
+  darkFontFamilyText: {
+    color: '#fff',
   },
 });
 

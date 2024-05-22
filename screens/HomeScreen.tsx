@@ -10,6 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Recipe } from "./RecipeListScreen";
+import { useTheme } from '@/statemanagement/ThemeContext'; // Adjust the import path as per your project structure
 
 type RootStackParamList = {
   Home: undefined;
@@ -30,6 +31,8 @@ type Props = {
 };
 
 const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
+
+  const { darkMode } = useTheme(); // Access the darkMode state from the context
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [currentUser, setCurrentUser] = useState<{
     name: string;
@@ -67,8 +70,8 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text>Main Menu</Text>
+    <View style={[styles.container, darkMode && styles.darkContainer]}>
+      <Text style={[styles.title, darkMode && styles.darkTitle]}>Main Menu</Text>
       <Text>Welcome, {currentUser.name}</Text>
       <Text>Email: {currentUser.email}</Text>
       <ScrollView style={{ flex: 1 }}>
@@ -100,6 +103,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#fff',
+  },
+
+  darkContainer: {
+    backgroundColor: '#333',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#000',
+  },
+  darkTitle: {
+    color: '#fff',
   },
   gridContainer: {
     flexDirection: "row",
