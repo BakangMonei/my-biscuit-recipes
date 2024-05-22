@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RouteProp } from "@react-navigation/native";
@@ -77,6 +78,7 @@ const RecipeDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         await AsyncStorage.setItem("favorites", JSON.stringify(favorites));
         setIsFavorite(true);
         Alert.alert("Success", "Recipe added to favorites");
+        navigation.navigate("FavoriteList");
       } else {
         Alert.alert("Warning", "Recipe already in favorites");
       }
@@ -95,6 +97,7 @@ const RecipeDetailScreen: React.FC<Props> = ({ route, navigation }) => {
         recipes[index] = { ...recipe, title, description, image };
         await AsyncStorage.setItem("recipes", JSON.stringify(recipes));
         Alert.alert("Success", "Recipe updated successfully");
+        navigation.goBack();
       } else {
         Alert.alert("Error", "Recipe not found");
       }
@@ -124,7 +127,7 @@ const RecipeDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.imageContainer}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
@@ -160,13 +163,13 @@ const RecipeDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           {isFavorite ? "Saved to Favorites" : "Add to Favorites"}
         </Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
     backgroundColor: "#fff",
   },
@@ -218,6 +221,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 5,
     alignItems: "center",
+    marginBottom: 16,
     opacity: (props) => (props.disabled ? 0.5 : 1),
   },
   favoritesButtonText: {

@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Switch, Button, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState, useEffect } from "react";
+import { View, Text, Switch, Button, StyleSheet, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from "@react-native-picker/picker";
 
 const PreferencesScreen: React.FC = ({ navigation }) => {
   const [darkMode, setDarkMode] = useState(false);
-  const [fontSize, setFontSize] = useState('medium');
-  const [fontType, setFontType] = useState('serif');
+  const [fontSize, setFontSize] = useState("medium");
+  const [fontType, setFontType] = useState("serif");
 
   useEffect(() => {
     const loadPreferences = async () => {
       try {
-        const savedPreferences = await AsyncStorage.getItem('preferences');
+        const savedPreferences = await AsyncStorage.getItem("preferences");
         if (savedPreferences) {
           const { darkMode, fontSize, fontType } = JSON.parse(savedPreferences);
           setDarkMode(darkMode);
@@ -28,8 +28,11 @@ const PreferencesScreen: React.FC = ({ navigation }) => {
 
   const savePreferences = async () => {
     try {
-      await AsyncStorage.setItem('preferences', JSON.stringify({ darkMode, fontSize, fontType }));
-      Alert.alert('Success', 'Preferences saved successfully');
+      await AsyncStorage.setItem(
+        "preferences",
+        JSON.stringify({ darkMode, fontSize, fontType })
+      );
+      Alert.alert("Success", "Preferences saved successfully");
     } catch (error) {
       console.error(error);
     }
@@ -37,11 +40,11 @@ const PreferencesScreen: React.FC = ({ navigation }) => {
 
   const resetPreferences = async () => {
     try {
-      await AsyncStorage.removeItem('preferences');
+      await AsyncStorage.removeItem("preferences");
       setDarkMode(false);
-      setFontSize('medium');
-      setFontType('serif');
-      Alert.alert('Success', 'Preferences reset to default');
+      setFontSize("medium");
+      setFontType("serif");
+      Alert.alert("Success", "Preferences reset to default");
     } catch (error) {
       console.error(error);
     }
@@ -49,10 +52,10 @@ const PreferencesScreen: React.FC = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
-      navigation.navigate('LoginPage');
+      await AsyncStorage.removeItem("user");
+      navigation.navigate("LoginPage");
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error("Error logging out:", error);
     }
   };
 
@@ -94,14 +97,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   preference: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginVertical: 8,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginVertical: 16,
   },
 });

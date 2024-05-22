@@ -1,15 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Image, Share } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { SwipeListView } from 'react-native-swipe-list-view';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+  Share,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { SwipeListView } from "react-native-swipe-list-view";
 
 type RootStackParamList = {
   Favorites: undefined;
   RecipeDetail: { recipe: Recipe };
 };
 
-type FavoritesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Favorites'>;
+type FavoritesScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Favorites"
+>;
 
 type Recipe = {
   id: number;
@@ -25,27 +36,34 @@ type Props = {
 const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
   const [favorites, setFavorites] = useState<Recipe[]>([]);
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const savedFavorites = await AsyncStorage.getItem('favorites');
-        if (savedFavorites) {
-          setFavorites(JSON.parse(savedFavorites));
-        }
-      } catch (error) {
-        console.error(error);
+  const fetchFavorites = async () => {
+    try {
+      const savedFavorites = await AsyncStorage.getItem("favorites");
+      if (savedFavorites) {
+        setFavorites(JSON.parse(savedFavorites));
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    fetchFavorites();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchFavorites();
+    }, 5000); // Adjust the interval as needed, here it reloads every 5 seconds
+
+    // Cleanup function to clear the interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   const removeFromFavorites = async (recipeId: number) => {
     try {
-      const updatedFavorites = favorites.filter((recipe) => recipe.id !== recipeId);
-      await AsyncStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      const updatedFavorites = favorites.filter(
+        (recipe) => recipe.id !== recipeId
+      );
+      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
       setFavorites(updatedFavorites);
-      Alert.alert('Success', 'Recipe removed from favorites');
+      Alert.alert("Success", "Recipe removed from favorites");
     } catch (error) {
       console.error(error);
     }
@@ -63,10 +81,17 @@ const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
         data={favorites}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("RecipeDetail", { recipe: item })
+            }
+          >
             <View style={styles.recipeItem}>
               {item.image ? (
-                <Image source={{ uri: item.image }} style={styles.recipeImage} />
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.recipeImage}
+                />
               ) : (
                 <View style={styles.placeholderImage} />
               )}
@@ -82,7 +107,6 @@ const FavoritesScreen: React.FC<Props> = ({ navigation }) => {
             >
               <Text style={styles.backTextWhite}>Share</Text>
             </TouchableOpacity>
-
 
             <TouchableOpacity
               style={[styles.backRightBtn, styles.backRightBtnRight]}
@@ -103,19 +127,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   recipeItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    backgroundColor: '#fff',
+    borderBottomColor: "#ccc",
+    backgroundColor: "#fff",
   },
   recipeTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 16,
   },
   recipeImage: {
@@ -127,31 +151,31 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
   },
   rowBack: {
-    alignItems: 'center',
-    backgroundColor: '#DDD',
+    alignItems: "center",
+    backgroundColor: "#DDD",
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     paddingRight: 15,
   },
   backRightBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     width: 75,
-    height: '100%',
-    backgroundColor: 'red',
+    height: "100%",
+    backgroundColor: "red",
   },
   backRightBtnLeft: {
-    backgroundColor: 'green',
+    backgroundColor: "green",
   },
   backRightBtnRight: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
   },
   backTextWhite: {
-    color: '#FFF',
+    color: "#FFF",
   },
 });
 

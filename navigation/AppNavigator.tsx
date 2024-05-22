@@ -7,6 +7,8 @@ import LoginScreen from "@/screens/LoginScreen";
 import RegistrationScreen from "@/screens/RegistrationScreen";
 import ForgotPasswordScreen from "@/screens/ForgotPasswordScreen";
 import { AppContext } from "@/statemanagement/AppContext";
+import FavoritesScreen from "@/screens/FavoritesScreen";
+import ChangePasswordScreen from "@/screens/ChangePasswordScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,7 +30,10 @@ const AppNavigator: React.FC = () => {
         />
       ) : (
         <>
-          <Stack.Screen
+    
+        </>
+      )}
+      <Stack.Screen
             name="LoginPage"
             component={LoginScreen}
             options={{ headerShown: false }}
@@ -48,8 +53,16 @@ const AppNavigator: React.FC = () => {
             component={MainNavigator}
             options={{ headerShown: false }}
           />
-        </>
-      )}
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+            name="FavoriteList"
+            component={FavoritesScreen}
+            options={{ headerShown: true }}
+          />
     </Stack.Navigator>
   );
 };

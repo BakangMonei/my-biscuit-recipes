@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Svg, { Path } from 'react-native-svg';
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Svg, { Path } from "react-native-svg";
 
 const SplashScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -9,7 +9,7 @@ const SplashScreen: React.FC = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.navigate('LoginPage');
+      navigation.navigate("LoginPage");
     }, 3000);
 
     // Start bouncing animation
@@ -27,7 +27,7 @@ const SplashScreen: React.FC = () => {
           easing: Easing.linear,
           useNativeDriver: true,
         }),
-      ]),
+      ])
     ).start();
 
     return () => clearTimeout(timer);
@@ -70,17 +70,17 @@ const SplashScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
   },
   cookieContainer: {
     marginBottom: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
   },
 });
 

@@ -50,6 +50,9 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     fetchRecipes();
+
+    // Cleanup function to clear any intervals set up by the effect
+    return () => {};
   }, []);
 
   // Function to refresh recipe list
@@ -63,6 +66,15 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshRecipeList();
+    }, 5000); // Adjust the interval as needed, here it reloads every 5 seconds
+
+    // Cleanup function to clear the interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   const deleteRecipe = async (recipeId: number) => {
     try {
@@ -81,7 +93,10 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleEdit = (recipe: Recipe) => {
-    navigation.navigate("AddRecipe", { recipe, refreshList: refreshRecipeList }); // Pass refreshList to AddRecipe
+    navigation.navigate("AddRecipe", {
+      recipe,
+      refreshList: refreshRecipeList,
+    }); // Pass refreshList to AddRecipe
   };
 
   return (
@@ -148,7 +163,9 @@ const RecipeListScreen: React.FC<Props> = ({ navigation }) => {
       />
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate("AddRecipe", { refreshList: refreshRecipeList })}
+        onPress={() =>
+          navigation.navigate("AddRecipe", { refreshList: refreshRecipeList })
+        }
       >
         <Text style={styles.addButtonText}>Add Recipe</Text>
       </TouchableOpacity>

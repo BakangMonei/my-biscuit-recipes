@@ -8,14 +8,13 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
-
-
 
 type RootStackParamList = {
   AddRecipe: undefined;
@@ -51,21 +50,21 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
       );
       return;
     }
-  
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.cancelled) {
       const uri = result.assets[0]?.uri; // Ensure the URI is correctly obtained from the result
       if (!uri) {
         Alert.alert("Error", "Failed to get the image URI. Please try again.");
         return;
       }
-  
+
       try {
         const base64 = await FileSystem.readAsStringAsync(uri, {
           encoding: FileSystem.EncodingType.Base64,
@@ -73,7 +72,10 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
         setImage(`data:image/jpeg;base64,${base64}`);
       } catch (error) {
         console.error("Error reading image file:", error);
-        Alert.alert("Error reading image file", "Please try selecting a different image.");
+        Alert.alert(
+          "Error reading image file",
+          "Please try selecting a different image."
+        );
       }
     }
   };
@@ -105,8 +107,8 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Add a Neeeew Recipe</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.header}>Add a New Recipe</Text>
       <View style={styles.imageContainer}>
         {image ? (
           <Image source={{ uri: image }} style={styles.image} />
@@ -133,13 +135,13 @@ const AddRecipeScreen: React.FC<Props> = ({ navigation }) => {
       <TouchableOpacity style={styles.saveButton} onPress={saveRecipe}>
         <Text style={styles.saveButtonText}>Save Recipe</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
     backgroundColor: "#fff",
   },

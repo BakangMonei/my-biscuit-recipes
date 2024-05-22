@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Recipe } from "./RecipeListScreen";
@@ -29,25 +36,34 @@ const HomeScreen: React.FC<Props> = ({ navigation, route }) => {
     email: string;
   }>({ name: "", email: "" });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const savedRecipes = await AsyncStorage.getItem("recipes");
-        if (savedRecipes) {
-          setRecipes(JSON.parse(savedRecipes));
-        }
-    
-        const userString = await AsyncStorage.getItem("currentUser");
-        if (userString) {
-          const user = JSON.parse(userString);
-          setCurrentUser(user);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+  const fetchData = async () => {
+    try {
+      const savedRecipes = await AsyncStorage.getItem("recipes");
+      if (savedRecipes) {
+        setRecipes(JSON.parse(savedRecipes));
       }
-    };
 
+      const userString = await AsyncStorage.getItem("currentUser");
+      if (userString) {
+        const user = JSON.parse(userString);
+        setCurrentUser(user);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
+  }, []);
+
+  // Auto-reload effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5000); // Adjust the interval as needed, here it reloads every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup function to clear interval on unmount
   }, []);
 
   return (
