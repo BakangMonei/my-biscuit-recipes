@@ -14,29 +14,30 @@ const LoginScreen: React.FC = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   const handleSubmission = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
-      return;
-    }
+    navigation.navigate("Main");
+    // if (!email || !password) {
+    //   Alert.alert("Error", "Please fill in all fields");
+    //   return;
+    // }
   
-    try {
-      const usersString = await AsyncStorage.getItem("users");
-      if (usersString) {
-        const users = JSON.parse(usersString);
-        const user = users.find((u) => u.email === email && u.password === password);
-        if (user) {
-          await AsyncStorage.setItem("currentUser", JSON.stringify(user)); // Store current user data
-          navigation.navigate("Main");
-        } else {
-          Alert.alert("Error", "Invalid email or password");
-        }
-      } else {
-        Alert.alert("Error", "No registered users found");
-      }
-    } catch (error) {
-      console.error("Error retrieving user data:", error);
-      Alert.alert("Error", "Failed to log in. Please try again.");
-    }
+    // try {
+    //   const usersString = await AsyncStorage.getItem("users");
+    //   if (usersString) {
+    //     const users = JSON.parse(usersString);
+    //     const user = users.find((u) => u.email === email && u.password === password);
+    //     if (user) {
+    //       await AsyncStorage.setItem("currentUser", JSON.stringify(user)); // Store current user data
+    //       navigation.navigate("Main");
+    //     } else {
+    //       Alert.alert("Error", "Invalid email or password");
+    //     }
+    //   } else {
+    //     Alert.alert("Error", "No registered users found");
+    //   }
+    // } catch (error) {
+    //   console.error("Error retrieving user data:", error);
+    //   Alert.alert("Error", "Failed to log in. Please try again.");
+    // }
   };
 
   return (
